@@ -34,7 +34,10 @@ import org.jboss.provisioning.ArtifactCoords.Gav;
  */
 public class Demo implements TaskContext {
 
+    static final Gav WEBAPP_GAV = ArtifactCoords.newGav("org.jboss.pm.demo", "webapp", "1.0.0.Final");
+
     static final Gav MYSQL_GAV = ArtifactCoords.newGav("org.jboss.pm.demo", "mysql-ds", "1.0.0.Final");
+
     static final Gav WFCORE_GAV = ArtifactCoords.newGav("org.wildfly.core:wildfly-core-feature-pack-new:4.0.0.Alpha1-SNAPSHOT");
     static final Gav WFSERVLET_GAV = ArtifactCoords.newGav("org.wildfly:wildfly-servlet-feature-pack-new:11.0.0.Final-SNAPSHOT");
     static final Gav WFLY_GAV = ArtifactCoords.newGav("org.wildfly:wildfly-feature-pack-new:11.0.0.Final-SNAPSHOT");
@@ -48,7 +51,8 @@ public class Demo implements TaskContext {
     public static void main(String[] args) throws Exception {
 
         Demo.newInstance()
-        .schedule(new MvnInstall())
+        .schedule(new MvnInstallMySqlFp())
+        .schedule(new MvnInstallWebAppFp())
         .schedule(new PmInstall())
         .doDemo();
     }

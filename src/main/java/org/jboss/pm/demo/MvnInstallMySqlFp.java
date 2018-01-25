@@ -28,7 +28,7 @@ import org.jboss.provisioning.spec.PackageDependencySpec;
  *
  * @author Alexey Loubyansky
  */
-public class MvnInstall extends Task {
+public class MvnInstallMySqlFp extends Task {
 
     @Override
     public void doExecute(TaskContext ctx) throws Exception {
@@ -80,8 +80,8 @@ public class MvnInstall extends Task {
                                 .setOrigin("wfly")
                                 .setParam("data-source", "MySqlDS")
                                 .setParam("jndi-name", "java:jboss/datasources/MySqlDS")
-                                .setParam("connection-url", "jdbc:mysql://YOUR_HOST/YOUR_DB")
                                 .setParam("driver-name", "mysql")
+                                .setParam("connection-url", "jdbc:mysql://YOUR_HOST/YOUR_DB")
                                 .setParam("user-name", "USER")
                                 .setParam("password", "PASSWORD"))
                         .addFeature(new FeatureConfig("ee-default-data-source-binding")

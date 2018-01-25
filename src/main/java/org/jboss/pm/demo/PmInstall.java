@@ -18,8 +18,12 @@
 package org.jboss.pm.demo;
 
 import org.jboss.provisioning.ProvisioningManager;
+import org.jboss.provisioning.config.ConfigModel;
+import org.jboss.provisioning.config.FeatureConfig;
+import org.jboss.provisioning.config.FeatureGroup;
 import org.jboss.provisioning.config.FeaturePackConfig;
 import org.jboss.provisioning.repomanager.FeaturePackRepositoryManager;
+import org.jboss.provisioning.spec.FeatureId;
 
 /**
  *
@@ -39,14 +43,29 @@ public class PmInstall extends Task {
                 .build();
 
         // Install customized WildFly
-        pm.install(FeaturePackConfig.builder(Demo.WFLY_GAV)
+
+        pm.install(FeaturePackConfig.builder(Demo.WFSERVLET_GAV)
                 .setInheritConfigs(false)
                 // picking the default configs to install
                 .includeDefaultConfig("standalone", "standalone.xml")
-                .includeDefaultConfig("standalone", "standalone-load-balancer.xml")
+                //.includeDefaultConfig("standalone", "standalone-load-balancer.xml")
                 .build());
 
         // Install MySql driver and a DataSource
-        pm.install(Demo.MYSQL_GAV);
+        pm.install(FeaturePackConfig.builder(Demo.MYSQL_GAV)
+                .addConfig(ConfigModel.builder("standalone", "standalone.xml")
+                        .addFeatureGroup(FeatureGroup.builder("mysql-ds")
+                                .includeFeature(FeatureId.fromString("data-source:data-source=MySqlDS"),
+                                        new FeatureConfig()
+                                        .setOrigin("wfly")
+                                        .setParam("connection-url", "jdbc:mysql://localhost/pm_demo")
+                                        .setParam("user-name", "pm")
+                                        .setParam("password", "Pm_Dem0!"))
+                                .build())
+                        .build())
+                .build());
+
+        // Install the Web app
+        pm.install(Demo.WEBAPP_GAV);
     }
 }

@@ -32,7 +32,7 @@ public abstract class Task {
     }
 
     protected void preExecute(TaskContext ctx) throws Exception {
-        System.out.println("Executing " + getClass().getSimpleName());
+        System.out.print("Executing " + getClass().getSimpleName() + "...");
         startTime = System.currentTimeMillis();
     }
 
@@ -41,6 +41,6 @@ public abstract class Task {
     protected void postExecute(TaskContext ctx) throws Exception {
         final long time = System.currentTimeMillis() - startTime;
         final long seconds = time / 1000;
-        System.out.println("    done in " + seconds + '.' + (time - seconds*1000) + " sec");
+        System.out.println(" done in " + seconds + '.' + (time - seconds*1000) + " sec");
     }
 }
