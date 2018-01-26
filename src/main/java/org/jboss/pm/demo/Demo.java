@@ -41,17 +41,17 @@ import org.jboss.provisioning.spec.FeatureId;
  */
 public class Demo implements TaskContext {
 
-    static final Gav WEBAPP_GAV = ArtifactCoords.newGav("org.jboss.pm.demo", "webapp", "1.0.0.Final");
+    public static final Gav WEBAPP_GAV = ArtifactCoords.newGav("org.jboss.pm.demo", "webapp", "1.0.0.Final");
 
-    static final Gav MYSQL_GAV = ArtifactCoords.newGav("org.jboss.pm.demo", "mysql-ds", "1.0.0.Final");
+    public static final Gav MYSQL_GAV = ArtifactCoords.newGav("org.jboss.pm.demo", "mysql-ds", "1.0.0.Final");
 
-    static final Gav WFCORE_GAV = ArtifactCoords.newGav("org.wildfly.core:wildfly-core-feature-pack-new:4.0.0.Alpha1-SNAPSHOT");
-    static final Gav WFSERVLET_GAV = ArtifactCoords.newGav("org.wildfly:wildfly-servlet-feature-pack-new:11.0.0.Final-SNAPSHOT");
-    static final Gav WFLY_GAV = ArtifactCoords.newGav("org.wildfly:wildfly-feature-pack-new:11.0.0.Final-SNAPSHOT");
+    public static final Gav WFCORE_GAV = ArtifactCoords.newGav("org.wildfly.core:wildfly-core-feature-pack-new:4.0.0.Alpha1-SNAPSHOT");
+    public static final Gav WFSERVLET_GAV = ArtifactCoords.newGav("org.wildfly:wildfly-servlet-feature-pack-new:11.0.0.Final-SNAPSHOT");
+    public static final Gav WFLY_GAV = ArtifactCoords.newGav("org.wildfly:wildfly-feature-pack-new:11.0.0.Final-SNAPSHOT");
 
     private static final Path HOME = Paths.get(System.getProperty("user.home")).resolve("pm-demo");
 
-    static Demo newInstance() {
+    public static Demo newInstance() {
         return new Demo();
     }
 
@@ -107,20 +107,20 @@ public class Demo implements TaskContext {
     private final List<Task> tasks = new ArrayList<>();
     private ProvisioningManager pm;
 
-    Demo installFp(ArtifactCoords.Gav gav) {
+    public Demo installFp(ArtifactCoords.Gav gav) {
         return pmInstallFp(FeaturePackConfig.forGav(gav));
     }
 
-    Demo pmInstallFp(FeaturePackConfig fpConfig) {
+    public Demo pmInstallFp(FeaturePackConfig fpConfig) {
         return schedule(new PmInstallFp(fpConfig));
     }
 
-    Demo schedule(Task task) {
+    public Demo schedule(Task task) {
         tasks.add(task);
         return this;
     }
 
-    void doDemo() throws Exception {
+    public void doDemo() throws Exception {
         for(Task task : tasks) {
             task.execute(this);
         }

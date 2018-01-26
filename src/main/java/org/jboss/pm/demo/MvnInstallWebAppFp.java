@@ -76,10 +76,6 @@ public class MvnInstallWebAppFp extends Task {
                         .setInheritConfigs(false)
                         .setInheritPackages(false)
                         .build())
-                .addDependency("wfcore", FeaturePackConfig.builder(Demo.WFCORE_GAV)
-                        .setInheritConfigs(false)
-                        .setInheritPackages(false)
-                        .build())
 
                 // DRIVER PACKAGE (BINARIES)
                 .newPackage("org.jboss.pm.demo.webapp.main", true)
