@@ -62,7 +62,7 @@ public class Demo implements TaskContext {
         // install feature-packs to the local Maven repo
         .schedule(new MvnInstallMySqlFp())
         .schedule(new MvnInstallWebAppFp())
-
+/*
         .pmInstallFp(
                 FeaturePackConfig.builder(Demo.WFSERVLET_GAV)
                 .setInheritConfigs(false)
@@ -86,6 +86,20 @@ public class Demo implements TaskContext {
                 .build())
 
         .installFp(WEBAPP_GAV)
+*/
+        .pmInstallFp(FeaturePackConfig.builder(WEBAPP_GAV)
+                .addConfig(ConfigModel.builder("standalone", "standalone.xml")
+                        .addFeatureGroup(FeatureGroup.builder("mysql-ds")
+                                .setOrigin("mysql-jdbc")
+                                .includeFeature(FeatureId.fromString("data-source:data-source=MySqlDS"),
+                                        new FeatureConfig()
+                                        .setOrigin("wfly")
+                                        .setParam("connection-url", "jdbc:mysql://localhost/pm_demo")
+                                        .setParam("user-name", "pm")
+                                        .setParam("password", "Pm_Dem0!"))
+                                .build())
+                        .build())
+                .build())
 
         .doDemo();
     }

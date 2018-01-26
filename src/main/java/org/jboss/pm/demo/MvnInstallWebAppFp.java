@@ -22,6 +22,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.jboss.pm.demo.web.DemoServlet;
+import org.jboss.provisioning.config.ConfigModel;
+import org.jboss.provisioning.config.FeatureConfig;
+import org.jboss.provisioning.config.FeatureGroup;
+import org.jboss.provisioning.config.FeaturePackConfig;
 import org.jboss.provisioning.repomanager.FeaturePackRepositoryManager;
 import org.jboss.provisioning.util.IoUtils;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -68,7 +72,15 @@ public class MvnInstallWebAppFp extends Task {
             newFeaturePack(Demo.WEBAPP_GAV)
 
                 // DEPENDENCIES ON OTHER FEATURE-PACKS
-                .addDependency(Demo.MYSQL_GAV)
+                .addDependency("mysql-jdbc", Demo.MYSQL_GAV)
+                .addDependency("wfservlet", FeaturePackConfig.builder(Demo.WFSERVLET_GAV)
+                        .setInheritConfigs(false)
+                        .setInheritPackages(false)
+                        .build())
+                .addDependency("wfcore", FeaturePackConfig.builder(Demo.WFCORE_GAV)
+                        .setInheritConfigs(false)
+                        .setInheritPackages(false)
+                        .build())
 
                 // DRIVER PACKAGE (BINARIES)
                 .newPackage("org.jboss.pm.demo.webapp.main", true)
@@ -76,6 +88,24 @@ public class MvnInstallWebAppFp extends Task {
                     .addPath("standalone/deployments/" + warPath.getFileName(), warPath, true)
                     .getFeaturePack()
 
+                .addFeatureGroup(FeatureGroup.builder("standalone-sockets")
+                        .addFeatureGroup(FeatureGroup.forGroup("wfservlet", "standalone-sockets"))
+                        .build())
+
+                .addConfig(ConfigModel.builder("standalone", "standalone.xml")
+                        .setProperty("config-name", "standalone.xml")
+
+                        .addFeatureGroup(FeatureGroup.forGroup("wfcore", "security-realms"))
+                        .addFeatureGroup(FeatureGroup.forGroup("wfcore", "interfaces"))
+                        .addFeature(new FeatureConfig("socket-binding-group")
+                                .setOrigin("wfcore")
+                                .addFeatureGroup(FeatureGroup.forGroup("this", "standalone-sockets")))
+                        .addFeatureGroup(FeatureGroup.forGroup("wfcore", "io"))
+                        .addFeatureGroup(FeatureGroup.forGroup("wfcore", "deployment-scanner"))
+
+                        .addFeatureGroup(FeatureGroup.forGroup("wfservlet", "security"))
+                        .addFeatureGroup(FeatureGroup.forGroup("wfservlet", "undertow"))
+                        .build())
                 .getInstaller()
         .install();
     }

@@ -39,7 +39,7 @@ public abstract class Task {
     }
 
     protected void preExecute(TaskContext ctx) throws Exception {
-        executingMsg = "Executing " + logAs();
+        executingMsg = logAs();
         System.out.print(executingMsg);
         startTime = System.currentTimeMillis();
     }
