@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.jboss.provisioning.ProvisioningManager;
 import org.jboss.provisioning.util.IoUtils;
 
 /**
@@ -47,4 +48,6 @@ public interface TaskContext {
         }
         return home;
     }
+
+    ProvisioningManager getPm() throws Exception;
 }

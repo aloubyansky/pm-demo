@@ -27,6 +27,13 @@ import java.util.List;
 
 import org.jboss.provisioning.ArtifactCoords;
 import org.jboss.provisioning.ArtifactCoords.Gav;
+import org.jboss.provisioning.ProvisioningManager;
+import org.jboss.provisioning.config.ConfigModel;
+import org.jboss.provisioning.config.FeatureConfig;
+import org.jboss.provisioning.config.FeatureGroup;
+import org.jboss.provisioning.config.FeaturePackConfig;
+import org.jboss.provisioning.repomanager.FeaturePackRepositoryManager;
+import org.jboss.provisioning.spec.FeatureId;
 
 /**
  *
@@ -51,13 +58,48 @@ public class Demo implements TaskContext {
     public static void main(String[] args) throws Exception {
 
         Demo.newInstance()
+
+        // install feature-packs to the local Maven repo
         .schedule(new MvnInstallMySqlFp())
         .schedule(new MvnInstallWebAppFp())
-        .schedule(new PmInstall())
+
+        .pmInstallFp(
+                FeaturePackConfig.builder(Demo.WFSERVLET_GAV)
+                .setInheritConfigs(false)
+                // picking the default configs to install
+                .includeDefaultConfig("standalone", "standalone.xml")
+                //.includeDefaultConfig("standalone", "standalone-load-balancer.xml")
+                .build())
+
+        .pmInstallFp(
+                FeaturePackConfig.builder(Demo.MYSQL_GAV)
+                .addConfig(ConfigModel.builder("standalone", "standalone.xml")
+                        .addFeatureGroup(FeatureGroup.builder("mysql-ds")
+                                .includeFeature(FeatureId.fromString("data-source:data-source=MySqlDS"),
+                                        new FeatureConfig()
+                                        .setOrigin("wfly")
+                                        .setParam("connection-url", "jdbc:mysql://localhost/pm_demo")
+                                        .setParam("user-name", "pm")
+                                        .setParam("password", "Pm_Dem0!"))
+                                .build())
+                        .build())
+                .build())
+
+        .installFp(WEBAPP_GAV)
+
         .doDemo();
     }
 
     private final List<Task> tasks = new ArrayList<>();
+    private ProvisioningManager pm;
+
+    Demo installFp(ArtifactCoords.Gav gav) {
+        return pmInstallFp(FeaturePackConfig.forGav(gav));
+    }
+
+    Demo pmInstallFp(FeaturePackConfig fpConfig) {
+        return schedule(new PmInstallFp(fpConfig));
+    }
 
     Demo schedule(Task task) {
         tasks.add(task);
@@ -68,6 +110,7 @@ public class Demo implements TaskContext {
         for(Task task : tasks) {
             task.execute(this);
         }
+        System.out.println("Complete!");
     }
 
     @Override
@@ -97,5 +140,18 @@ public class Demo implements TaskContext {
     @Override
     public Path getHome() {
         return HOME;
+    }
+
+    @Override
+    public ProvisioningManager getPm() throws Exception {
+        if(pm != null) {
+            return pm;
+        }
+        pm = ProvisioningManager.builder()
+                // set the artifact resolver
+                .setArtifactResolver(FeaturePackRepositoryManager.newInstance(getMvnRepoPath()))
+                // set the installation home dir
+                .setInstallationHome(getEmptyHome()).build();
+        return pm;
     }
 }

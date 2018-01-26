@@ -23,7 +23,14 @@ package org.jboss.pm.demo;
  */
 public abstract class Task {
 
+    private static final int EXECUTING_MSG_LENGTH = 90;
+
     private long startTime;
+    private String executingMsg;
+
+    protected String logAs() {
+        return getClass().getSimpleName();
+    }
 
     public void execute(TaskContext ctx) throws Exception {
         preExecute(ctx);
@@ -32,15 +39,25 @@ public abstract class Task {
     }
 
     protected void preExecute(TaskContext ctx) throws Exception {
-        System.out.print("Executing " + getClass().getSimpleName() + "...");
+        executingMsg = "Executing " + logAs();
+        System.out.print(executingMsg);
         startTime = System.currentTimeMillis();
     }
 
     protected abstract void doExecute(TaskContext ctx) throws Exception;
 
     protected void postExecute(TaskContext ctx) throws Exception {
+
+        final StringBuilder buf = new StringBuilder();
+        final int offset = EXECUTING_MSG_LENGTH - executingMsg.length();
+        if(offset > 0) {
+            for(int i = 0; i < offset; ++i) {
+                buf.append(' ');
+            }
+        }
         final long time = System.currentTimeMillis() - startTime;
         final long seconds = time / 1000;
-        System.out.println(" done in " + seconds + '.' + (time - seconds*1000) + " sec");
+        buf.append(" done in ").append(seconds).append('.').append(time - seconds*1000).append(" sec");
+        System.out.println(buf.toString());
     }
 }

@@ -35,6 +35,11 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 public class MvnInstallWebAppFp extends Task {
 
     @Override
+    protected String logAs() {
+        return "mvn install " + Demo.WEBAPP_GAV;
+    }
+
+    @Override
     protected void doExecute(TaskContext ctx) throws Exception {
 
         final Path tmpDir = IoUtils.createRandomTmpDir();

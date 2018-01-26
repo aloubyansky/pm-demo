@@ -22,25 +22,19 @@ import org.jboss.provisioning.config.ConfigModel;
 import org.jboss.provisioning.config.FeatureConfig;
 import org.jboss.provisioning.config.FeatureGroup;
 import org.jboss.provisioning.config.FeaturePackConfig;
-import org.jboss.provisioning.repomanager.FeaturePackRepositoryManager;
 import org.jboss.provisioning.spec.FeatureId;
 
 /**
  *
  * @author Alexey Loubyansky
  */
-public class PmInstall extends Task {
+public class PmInstallAll extends Task {
 
     @Override
     public void doExecute(TaskContext ctx) throws Exception {
 
         // INIT PM
-        final ProvisioningManager pm = ProvisioningManager.builder()
-                // set the artifact resolver
-                .setArtifactResolver(FeaturePackRepositoryManager.newInstance(ctx.getMvnRepoPath()))
-                // set the installation home dir
-                .setInstallationHome(ctx.getEmptyHome())
-                .build();
+        final ProvisioningManager pm = ctx.getPm();
 
         // Install customized WildFly
 

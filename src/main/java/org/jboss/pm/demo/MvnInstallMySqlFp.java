@@ -31,6 +31,11 @@ import org.jboss.provisioning.spec.PackageDependencySpec;
 public class MvnInstallMySqlFp extends Task {
 
     @Override
+    protected String logAs() {
+        return "mvn install " + Demo.MYSQL_GAV;
+    }
+
+    @Override
     public void doExecute(TaskContext ctx) throws Exception {
 
         FeaturePackRepositoryManager.newInstance(ctx.getMvnRepoPath()).
