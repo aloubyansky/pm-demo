@@ -45,9 +45,9 @@ public class Demo implements TaskContext {
 
     public static final Gav MYSQL_GAV = ArtifactCoords.newGav("org.jboss.pm.demo", "mysql-ds", "1.0.0.Final");
 
-    public static final Gav WFCORE_GAV = ArtifactCoords.newGav("org.wildfly.core:wildfly-core-feature-pack-new:4.0.0.Alpha1-SNAPSHOT");
-    public static final Gav WFSERVLET_GAV = ArtifactCoords.newGav("org.wildfly:wildfly-servlet-feature-pack-new:11.0.0.Final-SNAPSHOT");
-    public static final Gav WFLY_GAV = ArtifactCoords.newGav("org.wildfly:wildfly-feature-pack-new:11.0.0.Final-SNAPSHOT");
+    public static final Gav WFCORE_GAV = ArtifactCoords.newGav("org.wildfly.core:wildfly-core-feature-pack-new:4.0.0.Beta1-SNAPSHOT");
+    public static final Gav WFSERVLET_GAV = ArtifactCoords.newGav("org.wildfly:wildfly-servlet-feature-pack-new:12.0.0.Alpha1-SNAPSHOT");
+    public static final Gav WFLY_GAV = ArtifactCoords.newGav("org.wildfly:wildfly-feature-pack-new:12.0.0.Alpha1-SNAPSHOT");
 
     private static final Path HOME = Paths.get(System.getProperty("user.home")).resolve("pm-demo");
 
