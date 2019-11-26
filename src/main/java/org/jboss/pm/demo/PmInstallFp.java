@@ -17,8 +17,8 @@
 
 package org.jboss.pm.demo;
 
-import org.jboss.provisioning.ArtifactCoords;
-import org.jboss.provisioning.config.FeaturePackConfig;
+import org.jboss.galleon.config.FeaturePackConfig;
+import org.jboss.galleon.universe.FeaturePackLocation;
 
 /**
  *
@@ -28,8 +28,8 @@ public class PmInstallFp extends Task {
 
     private final FeaturePackConfig fpConfig;
 
-    public PmInstallFp(ArtifactCoords.Gav gav) {
-        this(FeaturePackConfig.forGav(gav));
+    public PmInstallFp(FeaturePackLocation fpl) {
+        this(FeaturePackConfig.forLocation(fpl));
     }
 
     public PmInstallFp(FeaturePackConfig fpConfig) {
@@ -38,7 +38,7 @@ public class PmInstallFp extends Task {
 
     @Override
     protected String logAs() {
-        return "pm install " + fpConfig.getGav();
+        return "pm install " + fpConfig.getLocation();
     }
 
     @Override

@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.jboss.provisioning.ProvisioningManager;
-import org.jboss.provisioning.util.IoUtils;
+import org.jboss.galleon.ProvisioningManager;
+
 
 /**
  *
@@ -39,7 +39,7 @@ public interface TaskContext {
     default Path getEmptyHome() throws Exception {
         final Path home = getHome();
         if(Files.exists(home)) {
-            IoUtils.recursiveDelete(home);
+            org.jboss.galleon.util.IoUtils.recursiveDelete(home);
         }
         try {
             Files.createDirectories(home);

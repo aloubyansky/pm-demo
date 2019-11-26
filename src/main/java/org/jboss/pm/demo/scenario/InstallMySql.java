@@ -17,13 +17,13 @@
 
 package org.jboss.pm.demo.scenario;
 
+import org.jboss.galleon.config.ConfigModel;
+import org.jboss.galleon.config.FeatureConfig;
+import org.jboss.galleon.config.FeatureGroup;
+import org.jboss.galleon.config.FeaturePackConfig;
+import org.jboss.galleon.spec.FeatureId;
 import org.jboss.pm.demo.Demo;
 import org.jboss.pm.demo.MvnInstallMySqlFp;
-import org.jboss.provisioning.config.ConfigModel;
-import org.jboss.provisioning.config.FeatureConfig;
-import org.jboss.provisioning.config.FeatureGroup;
-import org.jboss.provisioning.config.FeaturePackConfig;
-import org.jboss.provisioning.spec.FeatureId;
 
 /**
  *

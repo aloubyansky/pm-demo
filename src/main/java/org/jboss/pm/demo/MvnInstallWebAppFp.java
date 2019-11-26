@@ -21,12 +21,12 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.jboss.galleon.config.ConfigModel;
+import org.jboss.galleon.config.FeatureGroup;
+import org.jboss.galleon.config.FeaturePackConfig;
+import org.jboss.galleon.creator.FeaturePackCreator;
+import org.jboss.galleon.util.IoUtils;
 import org.jboss.pm.demo.web.DemoServlet;
-import org.jboss.provisioning.config.ConfigModel;
-import org.jboss.provisioning.config.FeatureGroup;
-import org.jboss.provisioning.config.FeaturePackConfig;
-import org.jboss.provisioning.repomanager.FeaturePackRepositoryManager;
-import org.jboss.provisioning.util.IoUtils;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -64,30 +64,29 @@ public class MvnInstallWebAppFp extends Task {
             war.as(ZipExporter.class).exportTo(out);
         }
 
-        FeaturePackRepositoryManager.newInstance(ctx.getMvnRepoPath()).
-        installer().
+        FeaturePackCreator.getInstance().
 
             // FEATURE-PACK
-            newFeaturePack(Demo.WEBAPP_GAV)
+            newFeaturePack().setFPID(Demo.WEBAPP_GAV.getFPID())
 
                 // DEPENDENCIES ON OTHER FEATURE-PACKS
+                // MySql driver and config
                 .addDependency("mysql-jdbc", Demo.MYSQL_GAV)
-                .addDependency("wfservlet", FeaturePackConfig.builder(Demo.WFSERVLET_GAV)
+                // Default Web server
+                .addDependency(FeaturePackConfig.builder(Demo.WFSERVLET_GAV)
                         .setInheritConfigs(false)
                         .setInheritPackages(false)
+        				.addConfig(ConfigModel.builder("standalone", "standalone.xml")
+        						.includeLayer("web-server")
+        						.build())
                         .build())
 
-                // DRIVER PACKAGE (BINARIES)
-                .newPackage("org.jboss.pm.demo.webapp.main", true)
+                // THE WEB APP PACKAGE (BINARIES)
+                .newPackage("org.jboss.pm.demo.webapp", true)
                     // Package content
                     .addPath("standalone/deployments/" + warPath.getFileName(), warPath, true)
                     .getFeaturePack()
-
-                .addConfig(ConfigModel.builder("standalone", "standalone.xml")
-                        .setProperty("config-name", "standalone.xml")
-                        .addFeatureGroup(FeatureGroup.forGroup("wfservlet", "web-support"))
-                        .build())
-                .getInstaller()
-        .install();
+				.getCreator()
+            .install();
     }
 }

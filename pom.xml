@@ -8,9 +8,14 @@
   <name>mysql</name>
   <dependencies>
     <dependency>
-      <groupId>org.jboss.pm</groupId>
-      <artifactId>feature-pack-api</artifactId>
-      <version>1.0.0.Alpha-SNAPSHOT</version>
+      <groupId>org.jboss.galleon</groupId>
+      <artifactId>galleon-core</artifactId>
+      <version>4.2.1.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.galleon</groupId>
+      <artifactId>galleon-maven-universe</artifactId>
+      <version>4.2.1.Final</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.spec.javax.servlet</groupId>

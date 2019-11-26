@@ -25,15 +25,15 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jboss.provisioning.ArtifactCoords;
-import org.jboss.provisioning.ArtifactCoords.Gav;
-import org.jboss.provisioning.ProvisioningManager;
-import org.jboss.provisioning.config.ConfigModel;
-import org.jboss.provisioning.config.FeatureConfig;
-import org.jboss.provisioning.config.FeatureGroup;
-import org.jboss.provisioning.config.FeaturePackConfig;
-import org.jboss.provisioning.repomanager.FeaturePackRepositoryManager;
-import org.jboss.provisioning.spec.FeatureId;
+import org.jboss.galleon.ProvisioningManager;
+import org.jboss.galleon.config.ConfigModel;
+import org.jboss.galleon.config.FeatureConfig;
+import org.jboss.galleon.config.FeatureGroup;
+import org.jboss.galleon.config.FeaturePackConfig;
+import org.jboss.galleon.spec.FeatureId;
+import org.jboss.galleon.universe.FeaturePackLocation;
+import org.jboss.galleon.universe.maven.repo.SimplisticMavenRepoManager;
+
 
 /**
  *
@@ -41,13 +41,13 @@ import org.jboss.provisioning.spec.FeatureId;
  */
 public class Demo implements TaskContext {
 
-    public static final Gav WEBAPP_GAV = ArtifactCoords.newGav("org.jboss.pm.demo", "webapp", "1.0.0.Final");
+    public static final FeaturePackLocation WEBAPP_GAV = FeaturePackLocation.fromString("org.jboss.pm.demo:webapp:1.0.0.Final");
 
-    public static final Gav MYSQL_GAV = ArtifactCoords.newGav("org.jboss.pm.demo", "mysql-ds", "1.0.0.Final");
+    public static final FeaturePackLocation MYSQL_GAV = FeaturePackLocation.fromString("org.jboss.pm.demo:mysql-ds:1.0.0.Final");
 
-    public static final Gav WFCORE_GAV = ArtifactCoords.newGav("org.wildfly.core:wildfly-core-feature-pack-new:4.0.0.Beta1-SNAPSHOT");
-    public static final Gav WFSERVLET_GAV = ArtifactCoords.newGav("org.wildfly:wildfly-servlet-feature-pack-new:12.0.0.Alpha1-SNAPSHOT");
-    public static final Gav WFLY_GAV = ArtifactCoords.newGav("org.wildfly:wildfly-feature-pack-new:12.0.0.Alpha1-SNAPSHOT");
+    public static final FeaturePackLocation WFCORE_GAV = FeaturePackLocation.fromString("org.wildfly.core:wildfly-core-galleon-pack:12.0.0.Final");
+    public static final FeaturePackLocation WFSERVLET_GAV = FeaturePackLocation.fromString("org.wildfly:wildfly-servlet-galleon-pack:18.0.1.Final");
+    public static final FeaturePackLocation WFLY_GAV = FeaturePackLocation.fromString("org.wildfly:wildfly-galleon-pack:18.0.1.Final");
 
     private static final Path HOME = Paths.get(System.getProperty("user.home")).resolve("pm-demo");
 
@@ -62,36 +62,12 @@ public class Demo implements TaskContext {
         // install feature-packs to the local Maven repo
         .schedule(new MvnInstallMySqlFp())
         .schedule(new MvnInstallWebAppFp())
-/*
-        .pmInstallFp(
-                FeaturePackConfig.builder(Demo.WFSERVLET_GAV)
-                .setInheritConfigs(false)
-                // picking the default configs to install
-                .includeDefaultConfig("standalone", "standalone.xml")
-                //.includeDefaultConfig("standalone", "standalone-load-balancer.xml")
-                .build())
 
-        .pmInstallFp(
-                FeaturePackConfig.builder(Demo.MYSQL_GAV)
-                .addConfig(ConfigModel.builder("standalone", "standalone.xml")
-                        .addFeatureGroup(FeatureGroup.builder("mysql-ds")
-                                .includeFeature(FeatureId.fromString("data-source:data-source=MySqlDS"),
-                                        new FeatureConfig()
-                                        .setOrigin("wfly")
-                                        .setParam("connection-url", "jdbc:mysql://localhost/pm_demo")
-                                        .setParam("user-name", "pm")
-                                        .setParam("password", "Pm_Dem0!"))
-                                .build())
-                        .build())
-                .build())
-
-        .installFp(WEBAPP_GAV)
-*/
         .pmInstallFp(FeaturePackConfig.builder(WEBAPP_GAV)
                 .addConfig(ConfigModel.builder("standalone", "standalone.xml")
                         .addFeatureGroup(FeatureGroup.builder("mysql-ds")
                                 .setOrigin("mysql-jdbc")
-                                .includeFeature(FeatureId.fromString("data-source:data-source=MySqlDS"),
+                                .includeFeature(FeatureId.fromString("subsystem.datasources.data-source:data-source=MySqlDS"),
                                         new FeatureConfig()
                                         .setOrigin("wfly")
                                         .setParam("connection-url", "jdbc:mysql://localhost/pm_demo")
@@ -107,8 +83,8 @@ public class Demo implements TaskContext {
     private final List<Task> tasks = new ArrayList<>();
     private ProvisioningManager pm;
 
-    public Demo installFp(ArtifactCoords.Gav gav) {
-        return pmInstallFp(FeaturePackConfig.forGav(gav));
+    public Demo installFp(FeaturePackLocation fpl) {
+        return pmInstallFp(FeaturePackConfig.forLocation(fpl));
     }
 
     public Demo pmInstallFp(FeaturePackConfig fpConfig) {
@@ -163,7 +139,7 @@ public class Demo implements TaskContext {
         }
         pm = ProvisioningManager.builder()
                 // set the artifact resolver
-                .setArtifactResolver(FeaturePackRepositoryManager.newInstance(getMvnRepoPath()))
+                .addArtifactResolver(SimplisticMavenRepoManager.getInstance(getMvnRepoPath()))
                 // set the installation home dir
                 .setInstallationHome(getEmptyHome()).build();
         return pm;

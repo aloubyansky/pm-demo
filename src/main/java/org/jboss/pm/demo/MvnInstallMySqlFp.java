@@ -17,12 +17,13 @@
 
 package org.jboss.pm.demo;
 
-import org.jboss.provisioning.config.ConfigModel;
-import org.jboss.provisioning.config.FeatureConfig;
-import org.jboss.provisioning.config.FeatureGroup;
-import org.jboss.provisioning.config.FeaturePackConfig;
-import org.jboss.provisioning.repomanager.FeaturePackRepositoryManager;
-import org.jboss.provisioning.spec.PackageDependencySpec;
+import org.jboss.galleon.config.ConfigModel;
+import org.jboss.galleon.config.FeatureConfig;
+import org.jboss.galleon.config.FeatureGroup;
+import org.jboss.galleon.config.FeaturePackConfig;
+import org.jboss.galleon.creator.FeaturePackCreator;
+import org.jboss.galleon.spec.PackageDependencySpec;
+import org.jboss.galleon.universe.maven.repo.SimplisticMavenRepoManager;
 
 /**
  *
@@ -38,11 +39,10 @@ public class MvnInstallMySqlFp extends Task {
     @Override
     public void doExecute(TaskContext ctx) throws Exception {
 
-        FeaturePackRepositoryManager.newInstance(ctx.getMvnRepoPath()).
-        installer().
-
+        FeaturePackCreator.getInstance()
+        
             // FEATURE-PACK
-            newFeaturePack(Demo.MYSQL_GAV)
+            .newFeaturePack().setFPID(Demo.MYSQL_GAV.getFPID())
 
                 // DEPENDENCIES ON OTHER FEATURE-PACKS
                 .addDependency("wfcore", FeaturePackConfig.builder(Demo.WFCORE_GAV)
@@ -61,16 +61,15 @@ public class MvnInstallMySqlFp extends Task {
                 // DRIVER PACKAGE (BINARIES)
                 .newPackage("com.mysql.main", true)
                     // Dependencies on the relevant javax.* packages
-                    .addDependency("wfcore", PackageDependencySpec.forPackage("javax.api.main"))
-                    .addDependency("wfservlet", PackageDependencySpec.forPackage("javax.transaction.api.main"))
+                    .addDependency("wfcore", PackageDependencySpec.required("javax.api"))
+                    .addDependency("wfservlet", PackageDependencySpec.required("javax.transaction.api"))
                     // Package content
                     .addDir("modules/system/layers/base/com/mysql/main", ctx.getResource("driver"), false, true)
                     .getFeaturePack()
 
                 // DRIVER CONFIG
                 .addFeatureGroup(FeatureGroup.builder("mysql-jdbc")
-                        .addFeatureGroup(FeatureGroup.forGroup("wfly", "ds-support"))
-                        .addFeature(new FeatureConfig("jdbc-driver")
+                        .addFeature(new FeatureConfig("subsystem.datasources.jdbc-driver")
                                 .setOrigin("wfly")
                                 .setParam("jdbc-driver", "mysql")
                                 .setParam("driver-name", "mysql")
@@ -81,7 +80,7 @@ public class MvnInstallMySqlFp extends Task {
                 // DATASOURCE CONFIG
                 .addFeatureGroup(FeatureGroup.builder("mysql-ds")
                         .addFeatureGroup(FeatureGroup.forGroup("mysql-jdbc"))
-                        .addFeature(new FeatureConfig("data-source")
+                        .addFeature(new FeatureConfig("subsystem.datasources.data-source")
                                 .setOrigin("wfly")
                                 .setParam("data-source", "MySqlDS")
                                 .setParam("jndi-name", "java:jboss/datasources/MySqlDS")
@@ -89,18 +88,20 @@ public class MvnInstallMySqlFp extends Task {
                                 .setParam("connection-url", "jdbc:mysql://YOUR_HOST/YOUR_DB")
                                 .setParam("user-name", "USER")
                                 .setParam("password", "PASSWORD"))
-                        .addFeature(new FeatureConfig("ee-default-data-source-binding")
+                        .addFeature(new FeatureConfig("subsystem.ee.service.default-bindings")
                                 .setOrigin("wfservlet")
                                 .setParam("datasource", "java:jboss/datasources/MySqlDS"))
                         .build())
 
                  // TARGET WFLY CONFIGS
                 .addConfig(ConfigModel.builder("standalone", null)
+                		.includeLayer("datasources")
                         .addFeatureGroup(FeatureGroup.forGroup("mysql-jdbc"))
                         .addFeatureGroup(FeatureGroup.forGroup("mysql-ds"))
                         .build())
 
-               .getInstaller()
+                .getCreator()
+                .addArtifactResolver(SimplisticMavenRepoManager.getInstance(ctx.getMvnRepoPath()))
         .install();
     }
 }
