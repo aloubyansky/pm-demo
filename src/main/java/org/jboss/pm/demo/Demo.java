@@ -66,10 +66,8 @@ public class Demo implements TaskContext {
         .pmInstallFp(FeaturePackConfig.builder(WEBAPP_GAV)
                 .addConfig(ConfigModel.builder("standalone", "standalone.xml")
                         .addFeatureGroup(FeatureGroup.builder("mysql-ds")
-                                .setOrigin("mysql-jdbc")
                                 .includeFeature(FeatureId.fromString("subsystem.datasources.data-source:data-source=MySqlDS"),
                                         new FeatureConfig()
-                                        .setOrigin("wfly")
                                         .setParam("connection-url", "jdbc:mysql://localhost/pm_demo")
                                         .setParam("user-name", "pm")
                                         .setParam("password", "Pm_Dem0!"))

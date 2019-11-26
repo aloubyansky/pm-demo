@@ -45,15 +45,15 @@ public class MvnInstallMySqlFp extends Task {
             .newFeaturePack().setFPID(Demo.MYSQL_GAV.getFPID())
 
                 // DEPENDENCIES ON OTHER FEATURE-PACKS
-                .addDependency("wfcore", FeaturePackConfig.builder(Demo.WFCORE_GAV)
+                .addDependency(FeaturePackConfig.builder(Demo.WFCORE_GAV)
                         .setInheritPackages(false)
                         .setInheritConfigs(false)
                         .build())
-                .addDependency("wfservlet",FeaturePackConfig.builder(Demo.WFSERVLET_GAV)
+                .addDependency(FeaturePackConfig.builder(Demo.WFSERVLET_GAV)
                         .setInheritPackages(false)
                         .setInheritConfigs(false)
                         .build())
-                .addDependency("wfly", FeaturePackConfig.builder(Demo.WFLY_GAV)
+                .addDependency(FeaturePackConfig.builder(Demo.WFLY_GAV)
                         .setInheritPackages(false)
                         .setInheritConfigs(false)
                         .build())
@@ -61,8 +61,8 @@ public class MvnInstallMySqlFp extends Task {
                 // DRIVER PACKAGE (BINARIES)
                 .newPackage("com.mysql.main", true)
                     // Dependencies on the relevant javax.* packages
-                    .addDependency("wfcore", PackageDependencySpec.required("javax.api"))
-                    .addDependency("wfservlet", PackageDependencySpec.required("javax.transaction.api"))
+                    .addDependency(PackageDependencySpec.required("javax.api"))
+                    .addDependency(PackageDependencySpec.required("javax.transaction.api"))
                     // Package content
                     .addDir("modules/system/layers/base/com/mysql/main", ctx.getResource("driver"), false, true)
                     .getFeaturePack()
@@ -70,7 +70,6 @@ public class MvnInstallMySqlFp extends Task {
                 // DRIVER CONFIG
                 .addFeatureGroup(FeatureGroup.builder("mysql-jdbc")
                         .addFeature(new FeatureConfig("subsystem.datasources.jdbc-driver")
-                                .setOrigin("wfly")
                                 .setParam("jdbc-driver", "mysql")
                                 .setParam("driver-name", "mysql")
                                 .setParam("driver-module-name", "com.mysql")
@@ -81,7 +80,6 @@ public class MvnInstallMySqlFp extends Task {
                 .addFeatureGroup(FeatureGroup.builder("mysql-ds")
                         .addFeatureGroup(FeatureGroup.forGroup("mysql-jdbc"))
                         .addFeature(new FeatureConfig("subsystem.datasources.data-source")
-                                .setOrigin("wfly")
                                 .setParam("data-source", "MySqlDS")
                                 .setParam("jndi-name", "java:jboss/datasources/MySqlDS")
                                 .setParam("driver-name", "mysql")
@@ -89,7 +87,6 @@ public class MvnInstallMySqlFp extends Task {
                                 .setParam("user-name", "USER")
                                 .setParam("password", "PASSWORD"))
                         .addFeature(new FeatureConfig("subsystem.ee.service.default-bindings")
-                                .setOrigin("wfservlet")
                                 .setParam("datasource", "java:jboss/datasources/MySqlDS"))
                         .build())
 

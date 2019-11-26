@@ -71,7 +71,7 @@ public class MvnInstallWebAppFp extends Task {
 
                 // DEPENDENCIES ON OTHER FEATURE-PACKS
                 // MySql driver and config
-                .addDependency("mysql-jdbc", Demo.MYSQL_GAV)
+                .addDependency(Demo.MYSQL_GAV)
                 // Default Web server
                 .addDependency(FeaturePackConfig.builder(Demo.WFSERVLET_GAV)
                         .setInheritConfigs(false)
